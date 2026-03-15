@@ -28,4 +28,18 @@ processed deliverable docs in `/docs`
 - its a only a python file for now : >>python serie.py
 
 ## Example output
-*insert screenshot
+```
+387 processes
+1 systemd
+    3138 pmlogger
+    4217 systemd
+        5122 gvfs-mtp-volume
+        5146 gjs
+        5163 tracker-miner-f
+        75824 crashhelper
+        5239 xdg-desktop-por
+        4223 sd-pam)
+        5245 xdg-desktop-por
+        4233 pipewire
+        4234 pipewire
+```
