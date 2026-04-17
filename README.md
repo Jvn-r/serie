@@ -4,9 +4,11 @@ Serie is a linux system analysis tool to interpret process behavior by using low
 built to answer "How do processes interact with files and each other to produce system behavior?"
 
 ## Core idea 
-to model system activity by extracting and structuring data, from `/proc/`, and treating a process as a dynamic object with lifecycle, hierarchy, relationships and resources 
+tools like `top` or `htop` show data, but they don’t really explain why things are happening or how processes interact.
 
-The goal is to make low-level system data easier to interpret for system monitoring, anomaly detection, behavioral pattern recognition and just understanding system behavior
+hence the idea to model system activity by extracting and structuring data, from `/proc/`, and treating a process as a dynamic object with lifecycle, hierarchy, relationships and resources 
+
+the goal is to make low-level system data easier to interpret for understanding system behavior, system monitoring, anomaly detection and pattern recognition
 
 ## Current Features
 - getting set of pids 
