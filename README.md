@@ -53,6 +53,3 @@ processed deliverable docs in `/docs`
         4233 pipewire
         4234 pipewire
 ```
-        ...
-```
-
