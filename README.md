@@ -10,7 +10,7 @@ hence the idea to model system activity by extracting and structuring data, from
 
 the goal is to make low-level system data easier to interpret for understanding system behavior, system monitoring, anomaly detection and pattern recognition
 
-## Current Features
+## Python Prototype Feats
 - getting set of pids 
 - detecting birth and death of processes : proc lifecycle
 - process metadata extraction thru `/proc/<pid>/stat/`
@@ -22,12 +22,32 @@ the goal is to make low-level system data easier to interpret for understanding 
 ## ONGOING REFACTOR TO C
 moving from quick prototyping in python to actual implementation in C to improve performance, enable deeper system integration and reduce overhead
 
-### Current Progress
-- PID's from `/proc/` using `readdir()`
-- plan for lifecycle detection 
+## Current C Implementation
+- PID extraction from `/proc/`
+- lifecycle snapshot framework
+- process hash table : O(1) PID lookup
+- collision handling thru bucket chaining
+- process ownership and memory management
+
+## Architecture
+### Process Table
+- hash table for fast PID lookup
+- bucket chaining for collision handling
+### Process Tree
+- parent-child hierarchy
+- process traversal and visualization
+### Event Layer
+- proc connector (`proc_conn`)
+- fork, exec and exit events
+### Logging Layer
+- periodic lifecycle flushing
+- future analytics dataset generation
 
 ## Planned Features 
-- process tree visualization improvements
+- process tree implementation
+- proc connector integration
+- lifecycle event tracking
+- process tree visualization
 - process-file interaction monitoring
 - feature extraction for processes like monitoring specific processes behaviours
 - anomaly or behaviour logging
@@ -37,12 +57,17 @@ moving from quick prototyping in python to actual implementation in C to improve
 
 ## Docs
 processed deliverable docs in `/docs`
+### Refactor docs
+- DELI 6 - Python to C refactor
+- DELI 7 - Lifecycle snapshot framework
+- DELI 8 - Event architecture & proc connector research
+- DELI 9 - Process hash table implementation
 
 ## Running
 - python :`python /py_proto/serie.py`
-- C : `gcc /c_imple/serie.c -o serie ; ./serie`
+- C : `gcc -Wall -Wextra main.c ser_proc.c -o serie; ./serie`
 
-## Example output
+## Python Prototype Example output
 ```
 387 processes
 1 systemd
