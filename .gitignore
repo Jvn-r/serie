@@ -1,3 +1,5 @@
 serie
 *.o 
 c_core/serie
+test
+tests/test

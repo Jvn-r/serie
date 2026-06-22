@@ -28,6 +28,7 @@ moving from quick prototyping in python to actual implementation in C to improve
 - process hash table : O(1) PID lookup
 - collision handling thru bucket chaining
 - process ownership and memory management
+- process tree implementation plus visualization
 
 ## Architecture
 ### Process Table
@@ -62,6 +63,7 @@ processed deliverable docs in `/docs`
 - DELI 7 - Lifecycle snapshot framework
 - DELI 8 - Event architecture & proc connector research
 - DELI 9 - Process hash table implementation
+- DELI 10 - Process tree relationships
 
 ## Running
 - python :`python /py_proto/serie.py`

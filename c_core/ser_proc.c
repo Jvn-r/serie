@@ -55,3 +55,33 @@ void proc_tabl_dest(proc_tabl *table){
     free(table->buckets);
     free(table);
 }
+
+int atta_chil(proc *pare, proc *chil){
+    if(pare == NULL || chil == NULL)
+        return -1;
+    if(pare == chil)
+        return -1;
+    chil->pare = pare;
+    chil->next_sibl = pare->firs_chil;
+    pare->firs_chil = chil;
+    return 0;
+}
+
+int deta_proc(proc *chil){
+    if(chil == NULL || chil->pare == NULL) 
+        return -1;
+    if(chil->pare->firs_chil == chil){
+        chil->pare->firs_chil = chil->next_sibl;
+    }else{
+        proc *curr = chil->pare->firs_chil;
+        while(curr->next_sibl != chil){
+            if(curr->next_sibl == NULL)
+                return -1;
+            curr = curr->next_sibl;
+        }
+        curr->next_sibl = chil->next_sibl;
+    }
+    chil->pare = NULL;
+    chil->next_sibl = NULL;
+    return 0;
+}

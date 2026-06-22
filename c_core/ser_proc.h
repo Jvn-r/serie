@@ -16,16 +16,16 @@ typedef struct proc{
     pid_t ppid;
     char state;
     pid_t tgid;
-    int fd_count;
+    int fd_coun;
     struct timespec birth_time;
     struct timespec death_time;
     //char **fd_paths;
     bool alive; //1 = alive, 0 = dead
     int exit_code;
   
-    struct proc *parent;
-    struct proc *first_child;
-    struct proc *next_sibling;
+    struct proc *pare;
+    struct proc *firs_chil;
+    struct proc *next_sibl;
 }proc;
 
 /*
@@ -52,5 +52,9 @@ int proc_inse(proc_tabl *table, proc *p);
 proc *proc_look(proc_tabl *table, pid_t pid);
 
 void proc_tabl_dest(proc_tabl *table);
+
+int atta_chil(proc *pare, proc *chil);
+
+int deta_proc(proc *chil);
 
 #endif
