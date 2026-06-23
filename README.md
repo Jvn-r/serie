@@ -29,6 +29,7 @@ moving from quick prototyping in python to actual implementation in C to improve
 - collision handling thru bucket chaining
 - process ownership and memory management
 - process tree implementation plus visualization
+- proc connector implemented
 
 ## Architecture
 ### Process Table
@@ -64,10 +65,12 @@ processed deliverable docs in `/docs`
 - DELI 8 - Event architecture & proc connector research
 - DELI 9 - Process hash table implementation
 - DELI 10 - Process tree relationships
+- DELI 11 - Proc Conn Integ 
 
 ## Running
 - python :`python /py_proto/serie.py`
 - C : `gcc -Wall -Wextra main.c ser_proc.c -o serie; ./serie`
+- proc conn : `gcc -Wall -Wextra tests/main.c c_core/ser_proc_conn.c -o test ;./test`
 
 ## Python Prototype Example output
 ```
@@ -81,4 +84,18 @@ processed deliverable docs in `/docs`
         5245 xdg-desktop-por
         4233 pipewire
         4234 pipewire
+```
+
+## Proc Conn Example Output
+```bash
+```bash
+[EXEC] Process PID: 535480 changed binaries
+EVENT: 1
+[FORK] Parent PID: 478391 -> Child PID: 511938
+EVENT: 512
+[COMM] Process PID: 511938 changed name to: StreamT~ns #247
+EVENT: 512
+[COMM] Process PID: 511938 changed name to: StreamT~ns #247
+EVENT: 2147483648
+[EXIT] Process PID: 478120 exited with code: 0
 ```

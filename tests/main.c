@@ -1,6 +1,8 @@
 #include<stdio.h>
-#include "../c_core/ser_proc.h"
+//#include "../c_core/ser_proc.h"
+#include "../c_core/ser_proc_conn.h"
 
+/*
 int test_hash(){
     printf("\n------HASH TEST---------\n");
     proc_tabl *table = calloc(1, sizeof(proc_tabl));
@@ -127,10 +129,26 @@ int test_tree(){
 
     return 0;
 }
+*/
+
+int test_proc_conn(){
+    int sock = sock_crea();
+    if(sock < 0)
+        return -1;
+    sock_regi(sock);
+    while(1){
+        sleep(1);
+        sock_reci(sock);
+    }
+    sock_unre(sock);
+    close(sock);
+    return 0;
+}
 
 int main(){
     //test_hash();
-    test_tree();
+    //test_tree();
+    test_proc_conn();
     return 0;
 }
 
