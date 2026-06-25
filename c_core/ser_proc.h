@@ -3,15 +3,19 @@
 
 #define PROC_BUCK_NODES 4096
 
+#include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
 #include<stdbool.h>
 #include<sys/types.h>
+#include "ser_prfs.h"
 
 typedef struct proc{
     pid_t pid;
-    uid_t uid;
-    gid_t gid;
+    uid_t ruid;
+    uid_t euid;
+    gid_t rgid;
+    gid_t egid;
     char name[16];
     pid_t ppid;
     char state;
@@ -19,7 +23,7 @@ typedef struct proc{
     int fd_coun;
     struct timespec birth_time;
     struct timespec death_time;
-    //char **fd_paths;
+    char **fd_paths;
     bool alive; //1 = alive, 0 = dead
     int exit_code;
   
@@ -55,6 +59,8 @@ void proc_tabl_dest(proc_tabl *table);
 
 int atta_chil(proc *pare, proc *chil);
 
-int deta_proc(proc *chil);
+int deta_chil(proc *pare, proc *chil);
+
+proc *proc_load(pid_t pid);
 
 #endif

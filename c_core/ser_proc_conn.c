@@ -1,4 +1,5 @@
 #include "ser_proc_conn.h"
+#include "ser_proc.h"
 
 int sock_crea(){
     int sock = socket(PF_NETLINK, SOCK_DGRAM | SOCK_NONBLOCK | SOCK_CLOEXEC, NETLINK_CONNECTOR);
@@ -84,7 +85,7 @@ int sock_send(int sock, enum proc_cn_mcast_op op){
     return 0;
 }
 
-int sock_reci(int sock){
+int sock_reci(proc_tabl *table, int sock){
     uint8_t buff[4096] = {0};
 
     struct iovec iov = {0};
@@ -121,7 +122,7 @@ int sock_reci(int sock){
         if((cn_msg->id.idx != CN_IDX_PROC) || (cn_msg->id.val != CN_VAL_PROC))
             continue;
 
-        read_even((struct proc_event *)cn_msg->data);
+        read_even(table, (struct proc_event *)cn_msg->data);
 
         if(nlmsghdr->nlmsg_type == NLMSG_DONE)
             break;
@@ -129,63 +130,90 @@ int sock_reci(int sock){
     return 0;
 }
 
-void read_even(struct proc_event *even){
+void read_even(proc_tabl *table, struct proc_event *even){
     printf("EVENT: %u\n", even->what);
     switch (even->what){
         case PROC_EVENT_FORK:
-            even_fork(even);
+            even_fork(table, even);
             break;
         case PROC_EVENT_EXEC:
-            even_exec(even);
+            even_exec(table, even);
             break;
         case PROC_EVENT_EXIT:
-            even_exit(even);
+            even_exit(table, even);
             break;
         case PROC_EVENT_COMM:
-            even_comm(even);
+            even_comm(table, even);
             break;
         case PROC_EVENT_UID:
-            even_uid(even);
+            even_uid(table, even);
             break;
         case PROC_EVENT_GID:
-            even_gid(even);
+            even_gid(table, even);
             break;
         default:
             break;
     }
 }
 
-void even_fork(struct proc_event *even){
-    printf("[FORK] Parent PID: %d -> Child PID: %d\n", 
-                   even->event_data.fork.parent_tgid, 
-                   even->event_data.fork.child_tgid);
+int even_fork(struct proc_tabl *table, struct proc_event *even){
+    printf("\n[FORK]\n");
+    proc *pare = proc_look(table, even->event_data.fork.parent_pid);
+    if(pare == NULL){
+        pare = proc_load(even->event_data.fork.parent_pid);
+        if(pare == NULL)
+            return -1;
+        if(proc_inse(table, pare) == -1){
+            proc_dest(pare);
+            return -1;
+        }
+    }
+    proc *chil = proc_load(even->event_data.fork.child_pid);
+    if(chil == NULL)
+        return -1;
+    if(atta_chil(pare, chil) == -1){                    //this ordering of atta_chil before proc_inse is done coz i dont have a clear rollback if atta_chil fails, so i need to make a proc_dele or sumn to remove non atta_chil procs from the hash
+        proc_dest(chil);
+        return -1;
+    }
+    if(proc_inse(table, chil) == -1){
+        deta_chil(pare, chil);
+        proc_dest(chil);
+        return -1;
+    }
+    printf("\n HOLY SHIT FORK COMPETED \n");
+    printf("Parent  : %d\n", pare->pid);
+    printf("Child   : %d\n", chil->pid);
+    printf("Name    : %s\n", chil->name);
+    printf("State   : %c\n", chil->state);
+    printf("FDs     : %d\n", chil->fd_coun);
+    return 0;
 }
 
-void even_exec(struct proc_event *even){
+void even_exec(proc_tabl *table, struct proc_event *even){
     printf("[EXEC] Process PID: %d changed binaries\n", 
                    even->event_data.exec.process_tgid);
 }
 
-void even_exit(struct proc_event *even){
+void even_exit(proc_tabl *table, struct proc_event *even){
     printf("[EXIT] Process PID: %d exited with code: %d\n", 
                    even->event_data.exit.process_tgid, 
                    even->event_data.exit.exit_code);
 }
 
-void even_comm(struct proc_event *even){
+void even_comm(proc_tabl *table, struct proc_event *even){
     printf("[COMM] Process PID: %d changed name to: %s\n",
            even->event_data.comm.process_tgid,
            even->event_data.comm.comm);
 }
 
-void even_uid(struct proc_event *even){
+void even_uid(proc_tabl *table, struct proc_event *even){
     printf("[UID] Process PID: %d changed UID: %u -> %u\n",
            even->event_data.id.process_tgid,
            even->event_data.id.r.ruid,
            even->event_data.id.e.euid);
 }
 
-void even_gid(struct proc_event *even){
+void even_gid(proc_tabl *table, struct proc_event *even){
     printf("[GID] Process PID: %d changed GID: %u -> %u\n",
            even->event_data.id.process_tgid,
            even->event_data.id.r.rgid,

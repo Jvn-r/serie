@@ -1,6 +1,7 @@
 #include<stdio.h>
-//#include "../c_core/ser_proc.h"
+#include "../c_core/ser_proc.h"
 #include "../c_core/ser_proc_conn.h"
+#include "../c_core/ser_prfs.h"
 
 /*
 int test_hash(){
@@ -132,23 +133,44 @@ int test_tree(){
 */
 
 int test_proc_conn(){
+    proc_tabl *table = calloc(1, sizeof(proc_tabl));
+    proc_tabl_init(table);
+
     int sock = sock_crea();
     if(sock < 0)
         return -1;
     sock_regi(sock);
     while(1){
         sleep(1);
-        sock_reci(sock);
+        sock_reci(table, sock);
     }
     sock_unre(sock);
     close(sock);
     return 0;
 }
 
+/*
+int test_prfs(){
+    proc *p = proc_load(getpid());
+    printf("PID      : %d\n", p->pid);
+    printf("PPID     : %d\n", p->ppid);
+    printf("TGID     : %d\n", p->tgid);
+    printf("State    : %c\n", p->state);
+    printf("Name     : %s\n", p->name);
+    printf("UID      : %d\n", p->ruid);
+    printf("GID      : %d\n", p->rgid);
+    printf("FD Count : %d\n", p->fd_coun);
+    for(int i = 0; i < p->fd_coun; i++)
+        printf("[%d] %s\n", i, p->fd_paths[i]);
+    proc_dest(p);
+    return 0;
+}
+*/
 int main(){
     //test_hash();
     //test_tree();
     test_proc_conn();
+    //test_prfs();
     return 0;
 }
 

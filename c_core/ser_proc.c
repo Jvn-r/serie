@@ -16,9 +16,8 @@ int proc_inse(proc_tabl *table, proc *p){
     size_t idx = proc_hash(p->pid);
     
     proc_buck_node *new_node = calloc(1,sizeof(proc_buck_node));
-    if(!new_node){
+    if(!new_node)
         return -1;
-    }
 
     new_node->p = p;
     new_node->next = table->buckets[idx];
@@ -67,13 +66,13 @@ int atta_chil(proc *pare, proc *chil){
     return 0;
 }
 
-int deta_proc(proc *chil){
-    if(chil == NULL || chil->pare == NULL) 
+int deta_chil(proc *pare, proc *chil){
+    if(chil == NULL || pare == NULL) 
         return -1;
-    if(chil->pare->firs_chil == chil){
-        chil->pare->firs_chil = chil->next_sibl;
+    if(pare->firs_chil == chil){
+        pare->firs_chil = chil->next_sibl;
     }else{
-        proc *curr = chil->pare->firs_chil;
+        proc *curr = pare->firs_chil;
         while(curr->next_sibl != chil){
             if(curr->next_sibl == NULL)
                 return -1;
@@ -81,7 +80,20 @@ int deta_proc(proc *chil){
         }
         curr->next_sibl = chil->next_sibl;
     }
-    chil->pare = NULL;
+    pare = NULL;
     chil->next_sibl = NULL;
     return 0;
+}
+
+proc *proc_load(pid_t pid){
+    proc *p = calloc(1, sizeof(proc));
+    if(p == NULL)
+        return NULL;
+
+    p->pid = pid;
+    if(prfs_look(p) < 0){
+        free(p);
+        return NULL;
+    }
+    return p;
 }

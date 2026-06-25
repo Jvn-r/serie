@@ -30,6 +30,8 @@ moving from quick prototyping in python to actual implementation in C to improve
 - process ownership and memory management
 - process tree implementation plus visualization
 - proc connector implemented
+- proc fs abstraction layer
+- fork event handled
 
 ## Architecture
 ### Process Table
@@ -66,6 +68,7 @@ processed deliverable docs in `/docs`
 - DELI 9 - Process hash table implementation
 - DELI 10 - Process tree relationships
 - DELI 11 - Proc Conn Integ 
+- DELI 12 - ProcFS Integ
 
 ## Running
 - python :`python /py_proto/serie.py`
@@ -86,16 +89,34 @@ processed deliverable docs in `/docs`
         4234 pipewire
 ```
 
-## Proc Conn Example Output
+## Proc Conn Example Output with FORK:
 ```bash
 ```bash
-[EXEC] Process PID: 535480 changed binaries
+[FORK]
+
+ HOLY SHIT FORK COMPETED 
+Parent : 4760
+Child  : 582355
+Name   : pool-gnome-term
+State  : S
+FDs    : 27
+EVENT: 512
+[COMM] Process PID: 477248 changed name to: pool-gnome-term
+EVENT: 2
+[EXEC] Process PID: 582354 changed binaries
 EVENT: 1
-[FORK] Parent PID: 478391 -> Child PID: 511938
-EVENT: 512
-[COMM] Process PID: 511938 changed name to: StreamT~ns #247
-EVENT: 512
-[COMM] Process PID: 511938 changed name to: StreamT~ns #247
+
+[FORK]
+EVENT: 2
+[EXEC] Process PID: 582356 changed binaries
+EVENT: 1
+
+[FORK]
+EVENT: 2
+[EXEC] Process PID: 582357 changed binaries
 EVENT: 2147483648
-[EXIT] Process PID: 478120 exited with code: 0
+[EXIT] Process PID: 582357 exited with code: 0
+EVENT: 1
 ```
+
+- the unhandled fork's are short lifespan processes like cat, which die before i can read the procfs for data

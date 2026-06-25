@@ -12,6 +12,8 @@
 #include<errno.h>
 #include<stdint.h>
 
+typedef struct proc_tabl proc_tabl;
+
 int sock_crea();
 
 void sock_regi(int sock);
@@ -20,20 +22,20 @@ void sock_unre(int sock);
 
 int sock_send(int sock, enum proc_cn_mcast_op op);
 
-int sock_reci(int sock);
+int sock_reci(struct proc_tabl *table, int sock);
 
-void read_even(struct proc_event *even);
+void read_even(struct proc_tabl *table, struct proc_event *even);
 
-void even_fork(struct proc_event *even);
+int even_fork(struct proc_tabl *table, struct proc_event *even);
 
-void even_exec(struct proc_event *even);
+void even_exec(struct proc_tabl *table, struct proc_event *even);
 
-void even_exit(struct proc_event *even);
+void even_exit(struct proc_tabl *table, struct proc_event *even);
 
-void even_comm(struct proc_event *even);
+void even_comm(struct proc_tabl *table, struct proc_event *even);
 
-void even_uid(struct proc_event *even);
+void even_uid(struct proc_tabl *table, struct proc_event *even);
 
-void even_gid(struct proc_event *even);
+void even_gid(struct proc_tabl *table, struct proc_event *even);
 
 #endif
