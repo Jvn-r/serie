@@ -32,6 +32,8 @@ moving from quick prototyping in python to actual implementation in C to improve
 - proc connector implemented
 - proc fs abstraction layer
 - fork event handled
+- added SIGINT handler
+- exit event handled
 
 ## Architecture
 ### Process Table
@@ -69,6 +71,7 @@ processed deliverable docs in `/docs`
 - DELI 10 - Process tree relationships
 - DELI 11 - Proc Conn Integ 
 - DELI 12 - ProcFS Integ
+- DELI 13 - Mem Cleanups and Exit Integ
 
 ## Running
 - python :`python /py_proto/serie.py`
@@ -89,34 +92,38 @@ processed deliverable docs in `/docs`
         4234 pipewire
 ```
 
-## Proc Conn Example Output with FORK:
+## Proc Conn Example Output with FORK and EXIT:
 ```bash
 ```bash
+ EXIT EXIT EXIT EXIT EXIT EXIT
+PID     : 673830
+Name    : pool-obsidian
+Exit    : 0
+Alive   : 0
+Parent: -1
+EVENT: 1
+
 [FORK]
 
  HOLY SHIT FORK COMPETED 
-Parent : 4760
-Child  : 582355
-Name   : pool-gnome-term
-State  : S
-FDs    : 27
+Parent  : 478391
+Child   : 673967
+Name    : StreamT~s #1928
+State   : S
+FDs     : 50
 EVENT: 512
-[COMM] Process PID: 477248 changed name to: pool-gnome-term
-EVENT: 2
-[EXEC] Process PID: 582354 changed binaries
-EVENT: 1
-
-[FORK]
-EVENT: 2
-[EXEC] Process PID: 582356 changed binaries
-EVENT: 1
-
-[FORK]
-EVENT: 2
-[EXEC] Process PID: 582357 changed binaries
+[COMM] Process PID: 478660 changed name to: StreamT~s #1928
+EVENT: 512
+[COMM] Process PID: 478660 changed name to: StreamT~s #1928
 EVENT: 2147483648
-[EXIT] Process PID: 582357 exited with code: 0
-EVENT: 1
+
+ EXIT EXIT EXIT EXIT EXIT EXIT
+PID     : 673690
+Name    : Isolated Web Co
+Exit    : 0
+Alive   : 0
+Parent: -1
+EVENT: 2147483648
 ```
 
 - the unhandled fork's are short lifespan processes like cat, which die before i can read the procfs for data

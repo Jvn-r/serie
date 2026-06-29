@@ -51,6 +51,8 @@ int prfs_stat(proc *p){
     skip_spac(&curs);
 
     p->ppid = (pid_t)strtol(curs, &curs, 10);
+    if(p->birth_ppid == -1)
+        p->birth_ppid = p->ppid;
     skip_spac(&curs);
 
     p->alive = true;
@@ -105,7 +107,7 @@ static DIR *prfs_open_dir(proc *p){
     return dp;
 }
 
-static inline void prfs_clean_fd(proc *p, int i){
+void prfs_clean_fd(proc *p, int i){
     for(int j = 0; j < i; j++)
         free(p->fd_paths[j]);
 
@@ -125,6 +127,9 @@ int prfs_fd(proc *p){
 
     struct dirent *dirs;
     int i = 0;
+
+    if (p->fd_paths != NULL)
+        prfs_clean_fd(p, p->fd_coun);
 
     p->fd_paths = malloc(p->fd_coun * sizeof(char *));
     if(p->fd_paths == NULL){
@@ -168,11 +173,3 @@ int prfs_fd(proc *p){
     return 0;
 }
 
-void proc_dest(proc *p){
-    if(p == NULL)
-        return;
-
-    prfs_clean_fd(p, p->fd_coun);
-
-    free(p);
-}

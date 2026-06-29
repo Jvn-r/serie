@@ -20,6 +20,6 @@ int prfs_status(proc *p);
 
 int prfs_fd(proc *p);
 
-void proc_dest(proc *p);
+void prfs_clean_fd(proc *p, int i);
 
 #endif

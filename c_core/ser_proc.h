@@ -17,7 +17,8 @@ typedef struct proc{
     gid_t rgid;
     gid_t egid;
     char name[16];
-    pid_t ppid;
+    pid_t ppid;                         //this ppid is a live rolling parent process id, needed for reparenting
+    pid_t birth_ppid;                   //this ppid stores the parent PID at process creation, and doesnt get updated during exit
     char state;
     pid_t tgid;
     int fd_coun;
@@ -53,6 +54,8 @@ int proc_tabl_init(proc_tabl *table);
 
 int proc_inse(proc_tabl *table, proc *p);
 
+int proc_dele(proc_tabl *table, proc *p);
+
 proc *proc_look(proc_tabl *table, pid_t pid);
 
 void proc_tabl_dest(proc_tabl *table);
@@ -62,5 +65,7 @@ int atta_chil(proc *pare, proc *chil);
 int deta_chil(proc *pare, proc *chil);
 
 proc *proc_load(pid_t pid);
+
+void proc_dest(proc *p);
 
 #endif

@@ -1,4 +1,5 @@
 #include "ser_proc.h"
+#include "ser_prfs.h"
 
 int proc_tabl_init(proc_tabl *table){
     table->bucket_count = PROC_BUCK_NODES;
@@ -27,15 +28,37 @@ int proc_inse(proc_tabl *table, proc *p){
     return 0;
 }
 
+int proc_dele(proc_tabl *table, proc *p){
+    size_t idx = proc_hash(p->pid);
+    proc_buck_node *curr = table->buckets[idx];
+    proc_buck_node *prev = NULL;
+
+    while(curr != NULL){
+        if(curr->p->pid == p->pid && curr->p->birth_time.tv_sec == p->birth_time.tv_sec && curr->p->birth_time.tv_nsec == p->birth_time.tv_nsec){
+            if(prev == NULL)
+                table->buckets[idx] = curr->next;
+            else
+                prev->next = curr->next;
+
+            proc_dest(curr->p);
+            free(curr);
+            return 0;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    return -1;
+}
+
 proc *proc_look(proc_tabl *table, pid_t pid){
     size_t idx = proc_hash(pid);
-    proc_buck_node *current = table->buckets[idx];
+    proc_buck_node *curr = table->buckets[idx];
 
-    while(current!=NULL){
-        if(current->p->pid == pid){
-            return current->p;
+    while(curr!=NULL){
+        if(curr->p->pid == pid){
+            return curr->p;
         }else{
-            current = current->next;
+            curr = curr->next;
         }
     }
     return NULL;
@@ -43,12 +66,12 @@ proc *proc_look(proc_tabl *table, pid_t pid){
 
 void proc_tabl_dest(proc_tabl *table){
     for(size_t i = 0; i < table->bucket_count; i++){
-        proc_buck_node *current = table->buckets[i];
-        while(current != NULL){
-            proc_buck_node *next = current->next;
-            free(current->p);
-            free(current);
-            current = next;
+        proc_buck_node *curr = table->buckets[i];
+        while(curr != NULL){
+            proc_buck_node *next = curr->next;
+            proc_dest(curr->p);
+            free(curr);
+            curr = next;
         }
     }
     free(table->buckets);
@@ -80,7 +103,7 @@ int deta_chil(proc *pare, proc *chil){
         }
         curr->next_sibl = chil->next_sibl;
     }
-    pare = NULL;
+    chil->pare = NULL;
     chil->next_sibl = NULL;
     return 0;
 }
@@ -95,5 +118,15 @@ proc *proc_load(pid_t pid){
         free(p);
         return NULL;
     }
+    p->birth_ppid = -1;
     return p;
+}
+
+void proc_dest(proc *p){
+    if(p == NULL)
+        return;
+
+    prfs_clean_fd(p, p->fd_coun);
+
+    free(p);
 }

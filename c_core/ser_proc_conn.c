@@ -105,8 +105,8 @@ int sock_reci(proc_tabl *table, int sock){
     ssize_t n = recvmsg(sock, &msg, 0);
     
     if(n <= 0){
-        printf("recvmsg returned nothing\n");
-        printf("errno msg = %s\n", strerror(errno));
+        //printf("recvmsg returned nothing\n");
+        //printf("errno msg = %s\n", strerror(errno));
         return -errno;
     }
     if(addr.nl_pid != 0){
@@ -171,6 +171,10 @@ int even_fork(struct proc_tabl *table, struct proc_event *even){
     proc *chil = proc_load(even->event_data.fork.child_pid);
     if(chil == NULL)
         return -1;
+
+    chil->birth_time.tv_sec = even->timestamp_ns / 1000000000ULL;
+    chil->birth_time.tv_nsec = even->timestamp_ns % 1000000000ULL;
+
     if(atta_chil(pare, chil) == -1){                    //this ordering of atta_chil before proc_inse is done coz i dont have a clear rollback if atta_chil fails, so i need to make a proc_dele or sumn to remove non atta_chil procs from the hash
         proc_dest(chil);
         return -1;
@@ -194,10 +198,52 @@ void even_exec(proc_tabl *table, struct proc_event *even){
                    even->event_data.exec.process_tgid);
 }
 
-void even_exit(proc_tabl *table, struct proc_event *even){
-    printf("[EXIT] Process PID: %d exited with code: %d\n", 
-                   even->event_data.exit.process_tgid, 
-                   even->event_data.exit.exit_code);
+static int re_pare(proc_tabl *table, proc *chil){
+    proc *pare = proc_look(table, chil->ppid);
+    if(pare == NULL){
+        pare = proc_load(chil->ppid);
+        if(pare == NULL)
+            return -1;
+        if(proc_inse(table, pare) == -1){
+            proc_dest(pare);
+            return -1;
+        }
+    }
+    if(atta_chil(pare, chil) == -1)
+        return -1;
+     printf("Reparent: %d (%s) -> %d (%s)\n", chil->pid, chil->name, pare->pid, pare->name);
+    return 0;
+}
+
+int even_exit(proc_tabl *table, struct proc_event *even){
+    proc *dead = proc_look(table, even->event_data.exit.process_pid);
+    if(dead == NULL)
+        return -1;
+
+    dead->alive = 0;
+    dead->exit_code = even->event_data.exit.exit_code;
+    dead->death_time.tv_sec = even->timestamp_ns / 1000000000ULL;
+    dead->death_time.tv_nsec = even->timestamp_ns % 1000000000ULL;
+
+    if(deta_chil(dead->pare, dead) == -1)
+        return -1;
+    printf("\n EXIT EXIT EXIT EXIT EXIT EXIT\n");
+    printf("PID     : %d\n", dead->pid);
+    printf("Name    : %s\n", dead->name);
+    printf("Exit    : %d\n", dead->exit_code);
+    printf("Alive   : %d\n", dead->alive);
+    printf("Parent: %d\n", dead->birth_ppid);
+
+    while(dead->firs_chil != NULL){
+        proc *chil = dead->firs_chil;
+        if(deta_chil(dead, chil) == -1)
+            return -1;
+        if(prfs_look(chil) == -1)
+            return -1;
+        if(re_pare(table, chil) == -1)
+            return -1;
+        }
+    return 0;
 }
 
 void even_comm(proc_tabl *table, struct proc_event *even){

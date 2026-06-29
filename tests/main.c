@@ -2,6 +2,14 @@
 #include "../c_core/ser_proc.h"
 #include "../c_core/ser_proc_conn.h"
 #include "../c_core/ser_prfs.h"
+#include <signal.h>
+
+volatile sig_atomic_t running = 1;
+
+void sigint_hand(int sig){
+    (void)sig;
+    running = 0;
+}
 
 /*
 int test_hash(){
@@ -64,7 +72,25 @@ void proc_tree_prin(proc *root, int depth){
     }
 }
 
-int test_tree(){
+int test_tree(){int proc_dele(proc_tabl *table, proc *p){
+    size_t idx = proc_hash(p->pid);
+    proc_buck_node *curr = table->buckets[idx];
+    proc_buck_node *prev = NULL;
+    while(curr != NULL){
+        if(curr->p->pid == p->pid && curr->p->birth_time.tv_sec == p->birth_time.tv_sec && curr->p->birth_time.tv_nsec == p->birth_time.tv_nsec){
+            if(prev == NULL)
+                table->buckets[idx] = curr->next;
+            else
+                prev->next = curr->next;
+            proc_dest(curr->p);
+            free(curr);
+            return 0;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    return -1;
+}
     printf("\n------TREE TEST---------\n");
 
     proc *P = calloc(1,sizeof(proc));
@@ -133,19 +159,34 @@ int test_tree(){
 */
 
 int test_proc_conn(){
-    proc_tabl *table = calloc(1, sizeof(proc_tabl));
-    proc_tabl_init(table);
+    signal(SIGINT, sigint_hand);
 
     int sock = sock_crea();
     if(sock < 0)
         return -1;
+
+    proc_tabl *table = calloc(1, sizeof(proc_tabl));
+    if(!table){
+        close(sock);
+        return -1;
+    }
+
+    if(proc_tabl_init(table) < 0){
+        free(table);
+        close(sock);
+        return -1;
+    }
+
     sock_regi(sock);
-    while(1){
-        sleep(1);
+
+    while(running){
+        //sleep(1);
         sock_reci(table, sock);
     }
+
     sock_unre(sock);
     close(sock);
+    proc_tabl_dest(table);
     return 0;
 }
 

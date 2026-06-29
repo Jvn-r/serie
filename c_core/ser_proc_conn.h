@@ -12,7 +12,7 @@
 #include<errno.h>
 #include<stdint.h>
 
-typedef struct proc_tabl proc_tabl;
+typedef struct proc_tabl table;
 
 int sock_crea();
 
@@ -30,7 +30,7 @@ int even_fork(struct proc_tabl *table, struct proc_event *even);
 
 void even_exec(struct proc_tabl *table, struct proc_event *even);
 
-void even_exit(struct proc_tabl *table, struct proc_event *even);
+int even_exit(struct proc_tabl *table, struct proc_event *even);
 
 void even_comm(struct proc_tabl *table, struct proc_event *even);
 
