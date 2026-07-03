@@ -124,5 +124,3 @@ Alive   : 0
 Parent: -1
 EVENT: 2147483648
 ```
-
-- the unhandled fork's are short lifespan processes like cat, which die before i can read the procfs for data
