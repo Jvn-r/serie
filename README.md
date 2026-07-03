@@ -20,7 +20,7 @@ the goal is to make low-level system data easier to interpret for understanding 
 - resolve fd symlink to get actual files 
 
 ## ONGOING REFACTOR TO C
-moving from quick prototyping in python to actual implementation in C to improve performance, enable deeper system integration and reduce overhead
+moving from quick prototyping in python to actual implementation in C to enable deeper system integration and improve speed
 
 ## Current C Implementation
 - PID extraction from `/proc/`
@@ -93,7 +93,6 @@ processed deliverable docs in `/docs`
 ```
 
 ## Proc Conn Example Output with FORK and EXIT:
-```bash
 ```bash
  EXIT EXIT EXIT EXIT EXIT EXIT
 PID     : 673830
