@@ -2,6 +2,8 @@
 #include "../c_core/ser_proc.h"
 #include "../c_core/ser_proc_conn.h"
 #include "../c_core/ser_prfs.h"
+#include "../c_core/ser_logg.h"
+#include "../c_core/cJSON.h"
 #include <signal.h>
 
 volatile sig_atomic_t running = 1;
@@ -72,7 +74,7 @@ void proc_tree_prin(proc *root, int depth){
     }
 }
 
-int test_tree(){int proc_dele(proc_tabl *table, proc *p){
+int test_tree(){
     size_t idx = proc_hash(p->pid);
     proc_buck_node *curr = table->buckets[idx];
     proc_buck_node *prev = NULL;
@@ -184,6 +186,8 @@ int test_proc_conn(){
         sock_reci(table, sock);
     }
 
+    logg_proc_parse(table);
+
     sock_unre(sock);
     close(sock);
     proc_tabl_dest(table);
@@ -206,12 +210,51 @@ int test_prfs(){
     proc_dest(p);
     return 0;
 }
+
+
+int test_cJSON(){
+
+    proc *p = proc_load(getpid());
+    cJSON *root = cJSON_CreateObject();
+
+    logg_proc_2_json(p, root);
+    char *str = cJSON_Print(root);
+    printf("%s", str);
+    FILE *fp = fopen("/home/jean/me/codes/Serie/logs/test_data.json", "w");
+    if(fp == NULL){
+        printf("FILLLLLLE BAD IDK");
+        return -1;
+    }
+
+    fputs(str, fp);
+    fclose(fp);
+    cJSON_Delete(root);
+    free(str);
+    proc_dest(p);
+
+    return 0;
+}
+
+
+int test_json_full(){
+    proc_tabl *table = calloc(1, sizeof(proc_tabl));
+    proc_tabl_init(table);
+    proc *p = proc_load(getpid());
+    proc_inse(table, p);
+
+    logg_proc_parse(table);
+
+    proc_tabl_dest(table);
+    return 0;
+}
 */
+
 int main(){
     //test_hash();
     //test_tree();
     test_proc_conn();
     //test_prfs();
+    //test_json_full();
     return 0;
 }
 

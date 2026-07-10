@@ -3,3 +3,5 @@ serie
 c_core/serie
 test
 tests/test
+logs/*.json
+logs/*.ndjson

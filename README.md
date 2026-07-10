@@ -34,6 +34,7 @@ moving from quick prototyping in python to actual implementation in C to enable 
 - fork event handled
 - added SIGINT handler
 - exit event handled
+- logger implemented
 
 ## Architecture
 ### Process Table
@@ -72,11 +73,13 @@ processed deliverable docs in `/docs`
 - DELI 11 - Proc Conn Integ 
 - DELI 12 - ProcFS Integ
 - DELI 13 - Mem Cleanups and Exit Integ
+- DELI 14 - Logger Integ
 
 ## Running
 - python :`python /py_proto/serie.py`
 - C : `gcc -Wall -Wextra main.c ser_proc.c -o serie; ./serie`
 - proc conn : `gcc -Wall -Wextra tests/main.c c_core/ser_proc_conn.c -o test ;./test`
+- logger : `gcc -g -Wall -Wextra tests/main.c c_core/cJSON.c c_core/ser_proc.c c_core/ser_prfs.c c_core/ser_logg.c c_core/ser_proc_conn.c -o test;./test`
 
 ## Python Prototype Example output
 ```
@@ -123,4 +126,13 @@ Exit    : 0
 Alive   : 0
 Parent: -1
 EVENT: 2147483648
+```
+
+## data.ndjson Sample Output
+```json
+...
+{"pid":1222991,"real-uid":1000,"effective-uid":1000,"read-gid":1000,"effective-gid":1000,"name":"TaskCon~ller #6","parent-pid":478391,"birth-parent-pid":-1,"state":"S","thread-gid":1222962,"FD-count":43,"birth-time":"2026-05-12 04:36:42.653552348","death-time":"2026-05-04 16:17:08.079720243","alive":true,"exit-code":0,"next-sibling-pid":1222990}
+{"pid":1222992,"real-uid":1000,"effective-uid":1000,"read-gid":1000,"effective-gid":1000,"name":"TaskCon~ller #7","parent-pid":478391,"birth-parent-pid":-1,"state":"S","thread-gid":1222962,"FD-count":43,"birth-time":"2026-05-12 04:36:42.653606723","death-time":"2026-05-04 16:17:08.079720364","alive":true,"exit-code":0,"next-sibling-pid":1222991}
+{"pid":478391,"real- ...
+```
 ```
