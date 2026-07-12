@@ -74,6 +74,7 @@ processed deliverable docs in `/docs`
 - DELI 12 - ProcFS Integ
 - DELI 13 - Mem Cleanups and Exit Integ
 - DELI 14 - Logger Integ
+- DELI 15 - fd_paths Imple and Time Bug Fix
 
 ## Running
 - python :`python /py_proto/serie.py`
@@ -130,9 +131,5 @@ EVENT: 2147483648
 
 ## data.ndjson Sample Output
 ```json
-...
-{"pid":1222991,"real-uid":1000,"effective-uid":1000,"read-gid":1000,"effective-gid":1000,"name":"TaskCon~ller #6","parent-pid":478391,"birth-parent-pid":-1,"state":"S","thread-gid":1222962,"FD-count":43,"birth-time":"2026-05-12 04:36:42.653552348","death-time":"2026-05-04 16:17:08.079720243","alive":true,"exit-code":0,"next-sibling-pid":1222990}
-{"pid":1222992,"real-uid":1000,"effective-uid":1000,"read-gid":1000,"effective-gid":1000,"name":"TaskCon~ller #7","parent-pid":478391,"birth-parent-pid":-1,"state":"S","thread-gid":1222962,"FD-count":43,"birth-time":"2026-05-12 04:36:42.653606723","death-time":"2026-05-04 16:17:08.079720364","alive":true,"exit-code":0,"next-sibling-pid":1222991}
-{"pid":478391,"real- ...
-```
+{"pid":1322946,"real-uid":1000,"effective-uid":1000,"read-gid":1000,"effective-gid":1000,"name":"forkserver","parent-pid":1322723,"birth-parent-pid":-1,"state":"S","thread-gid":1322946,"FD-count":10,"birth-time":"2026-07-04 08:41:43.176373848","death-time":"not dead","fd_paths":"[\"/dev/null\",\"socket:[4096456]\",\"socket:[4096456]\",\"socket:[4094110]\",\"pipe:[4094111]\",\"/dev/null\",\"/dev/null\",\"/dev/null\",\"/snap/firefox/8595/usr/lib/firefox/omni.ja\",\"/snap/firefox/8595/usr/lib/firefox/browser/omni.ja\"]","alive":true,"exit-code":0,"first-child-pid":1338238}
 ```

@@ -24,7 +24,7 @@ static void timespec_sub(struct timespec *a, struct timespec *b, struct timespec
 
 int logg_time_reso(struct timespec *some_time, char *buff, size_t buff_size){
     struct timespec real_now, boot_now, boot_base, reso_time;
-    if(clock_gettime(CLOCK_BOOTTIME, &boot_now) != 0)
+    if(clock_gettime(CLOCK_MONOTONIC, &boot_now) != 0)
         return -1;
     if(clock_gettime(CLOCK_REALTIME, &real_now) != 0)
         return -1;
@@ -43,6 +43,14 @@ int logg_time_reso(struct timespec *some_time, char *buff, size_t buff_size){
     return 0;
 }
 
+static void logg_fd_paths_2_json(cJSON *json, proc *p){
+    cJSON *arr = cJSON_CreateStringArray(p->fd_paths, p->fd_coun);
+    char *fdpa = cJSON_PrintUnformatted(arr);
+    cJSON_AddStringToObject(json, "fd_paths",fdpa);
+    free(fdpa);
+    cJSON_Delete(arr);
+}
+
 void logg_proc_2_json(proc *p, cJSON *json){
     if(json == NULL)
         return;
@@ -51,7 +59,11 @@ void logg_proc_2_json(proc *p, cJSON *json){
     size_t buff_size = 64;
 
     logg_time_reso(&p->birth_time, bt_buff, buff_size);
-    logg_time_reso(&p->death_time, dt_buff, buff_size);
+
+    if(p->death_time.tv_sec != 0)
+        logg_time_reso(&p->death_time, dt_buff, buff_size);
+    else
+        dt_buff[0] = '\0';
 
     cJSON_AddNumberToObject(json, "pid", p->pid);
     cJSON_AddNumberToObject(json, "real-uid", p->ruid);
@@ -67,15 +79,17 @@ void logg_proc_2_json(proc *p, cJSON *json){
     cJSON_AddNumberToObject(json, "thread-gid", p->tgid);
     cJSON_AddNumberToObject(json, "FD-count", p->fd_coun);
     cJSON_AddStringToObject(json, "birth-time", bt_buff);
-    cJSON_AddStringToObject(json, "death-time", dt_buff);
-    //add array of fd's 
+    if(dt_buff[0] != '\0')
+        cJSON_AddStringToObject(json, "death-time", dt_buff);
+    else
+        cJSON_AddStringToObject(json, "death-time", "not dead");
+    logg_fd_paths_2_json(json, p);
     cJSON_AddBoolToObject(json, "alive", p->alive);
     cJSON_AddNumberToObject(json, "exit-code", p->exit_code);
     if(p->firs_chil != NULL)
         cJSON_AddNumberToObject(json, "first-child-pid", p->firs_chil->pid);
     if(p->next_sibl != NULL)
         cJSON_AddNumberToObject(json, "next-sibling-pid", p->next_sibl->pid);
-    
 }
 
 static int logg_mem_writ(cJSON *j, char **json_buff, size_t *curr_len);
