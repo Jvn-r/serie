@@ -35,6 +35,7 @@ moving from quick prototyping in python to actual implementation in C to enable 
 - added SIGINT handler
 - exit event handled
 - logger implemented
+- comm, exec, uid, gid events handled
 
 ## Architecture
 ### Process Table
@@ -75,6 +76,7 @@ processed deliverable docs in `/docs`
 - DELI 13 - Mem Cleanups and Exit Integ
 - DELI 14 - Logger Integ
 - DELI 15 - fd_paths Imple and Time Bug Fix
+- DELI 16 - comm, exec, UID and GID
 
 ## Running
 - python :`python /py_proto/serie.py`
