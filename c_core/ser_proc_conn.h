@@ -11,6 +11,7 @@
 #include<linux/connector.h>
 #include<errno.h>
 #include<stdint.h>
+#include "ser_prfs.h"
 
 typedef struct proc_tabl table;
 
@@ -28,14 +29,14 @@ void read_even(struct proc_tabl *table, struct proc_event *even);
 
 int even_fork(struct proc_tabl *table, struct proc_event *even);
 
-void even_exec(struct proc_tabl *table, struct proc_event *even);
+int even_exec(struct proc_tabl *table, struct proc_event *even);
 
 int even_exit(struct proc_tabl *table, struct proc_event *even);
 
-void even_comm(struct proc_tabl *table, struct proc_event *even);
+int even_comm(struct proc_tabl *table, struct proc_event *even);
 
-void even_uid(struct proc_tabl *table, struct proc_event *even);
+int even_uid(struct proc_tabl *table, struct proc_event *even);
 
-void even_gid(struct proc_tabl *table, struct proc_event *even);
+int even_gid(struct proc_tabl *table, struct proc_event *even);
 
 #endif

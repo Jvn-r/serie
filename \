@@ -272,7 +272,7 @@ int even_uid(proc_tabl *table, struct proc_event *even){
     puid->ruid = even->event_data.id.r.ruid;
     puid->euid = even->event_data.id.e.euid;
  
-    printf("[UID] Process PID: %d changed UID: %u\n", puid->pid, puid->ruid, puid->euid);
+    printf("[UID] Process PID: %d changed UID: %u -> %u\n", puid->pid, puid->ruid, puid->euid);
     return 0;
 }
 
@@ -284,6 +284,6 @@ int even_gid(proc_tabl *table, struct proc_event *even){
     pgid->rgid = even->event_data.id.r.rgid;
     pgid->egid = even->event_data.id.e.egid;
  
-    printf("[GID] Process PID: %d changed GID: %u\n", pgid->pid, pgid->rgid, pgid->egid);
+    printf("[GID] Process PID: %d changed GID: %u -> %u\n", pgid->pid, pgid->rgid, pgid->egid);
     return 0;
 }

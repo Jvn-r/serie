@@ -108,10 +108,14 @@ static DIR *prfs_open_dir(proc *p){
 }
 
 void prfs_clean_fd(proc *p, int i){
-    for(int j = 0; j < i; j++)
-        free(p->fd_paths[j]);
+    if(i != 0){
+        for(int j = 0; j < i; j++)
+            free(p->fd_paths[j]);
+    }
 
-    free(p->fd_paths);
+    if(p->fd_paths != NULL)
+        free(p->fd_paths);
+
     p->fd_paths = NULL;
 }
 
@@ -128,13 +132,13 @@ int prfs_fd(proc *p){
     struct dirent *dirs;
     int i = 0;
 
-    if (p->fd_paths != NULL)
+    if(p->fd_paths != NULL)
         prfs_clean_fd(p, p->fd_coun);
 
     p->fd_paths = malloc(p->fd_coun * sizeof(char *));
     if(p->fd_paths == NULL){
         closedir(dp);
-        return -1; 
+        return -1;
     }
 
     while((dirs = readdir(dp)) != NULL){
