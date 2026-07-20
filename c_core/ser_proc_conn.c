@@ -92,9 +92,9 @@ int sock_reci(proc_tabl *table, int sock){
     struct iovec iov = {0};
     iov.iov_base = buff;
     iov.iov_len = sizeof(buff);
-    
+
     struct sockaddr_nl addr = {0};
-    
+
     struct msghdr msg = {0};
     msg.msg_name = &addr;
     msg.msg_namelen = sizeof(addr);
@@ -104,11 +104,14 @@ int sock_reci(proc_tabl *table, int sock){
     msg.msg_controllen = 0;
 
     ssize_t n = recvmsg(sock, &msg, 0);
-    
-    if(n <= 0){
-        //printf("recvmsg returned nothing\n");
-        //printf("errno msg = %s\n", strerror(errno));
+
+    if(n < 0){
+        if(errno == EINTR)                          //this is a timer interrupt
+            return 0;
         return -errno;
+    }
+    if(n == 0){
+        return 0;
     }
     if(addr.nl_pid != 0){
         printf("addr nlpid != 0, so its not from the core kernel\n");
@@ -272,7 +275,7 @@ int even_uid(proc_tabl *table, struct proc_event *even){
     puid->ruid = even->event_data.id.r.ruid;
     puid->euid = even->event_data.id.e.euid;
  
-    printf("[UID] Process PID: %d changed UID: %u\n", puid->pid, puid->ruid, puid->euid);
+    printf("[UID] Process PID: %d changed UID: %u, %u\n", puid->pid, puid->ruid, puid->euid);
     return 0;
 }
 
@@ -284,6 +287,6 @@ int even_gid(proc_tabl *table, struct proc_event *even){
     pgid->rgid = even->event_data.id.r.rgid;
     pgid->egid = even->event_data.id.e.egid;
  
-    printf("[GID] Process PID: %d changed GID: %u\n", pgid->pid, pgid->rgid, pgid->egid);
+    printf("[GID] Process PID: %d changed GID: %u, %u\n", pgid->pid, pgid->rgid, pgid->egid);
     return 0;
 }

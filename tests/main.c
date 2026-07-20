@@ -4,16 +4,26 @@
 #include "../c_core/ser_prfs.h"
 #include "../c_core/ser_logg.h"
 #include "../c_core/cJSON.h"
-#include <signal.h>
+#include<stdlib.h>
+#include<time.h>
+#include<signal.h>
+#include<unistd.h>
 
 volatile sig_atomic_t running = 1;
+volatile sig_atomic_t logg_run = 0;
 
 void sigint_hand(int sig){
-    (void)sig;
-    running = 0;
+    if(sig == SIGINT){
+        running = 0;
+    }else if(sig == SIGUSR1){                       //SIGUSR1 is the timer signal for logging
+        logg_run = 1;
+    }
 }
 
 /*
+void timer_handler(int sig, siginfo_t *si, void *uc) {
+    printf("High-precision tick occurred!\n");
+}
 int test_hash(){
     printf("\n------HASH TEST---------\n");
     proc_tabl *table = calloc(1, sizeof(proc_tabl));
@@ -83,6 +93,9 @@ int test_tree(){
             if(prev == NULL)
                 table->buckets[idx] = curr->next;
             else
+void timer_handler(int sig, siginfo_t *si, void *uc) {
+    printf("High-precision tick occurred!\n");
+}
                 prev->next = curr->next;
             proc_dest(curr->p);
             free(curr);
@@ -160,12 +173,52 @@ int test_tree(){
 }
 */
 
+int timer_setup(timer_t *timerid, int interval){
+	struct sigevent sev = {0};
+	struct sigaction sa = {0};
+	struct itimerspec its = {0};
+
+	sa.sa_handler = sigint_hand;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGUSR1, &sa, NULL);
+
+	sev.sigev_notify = SIGEV_SIGNAL;
+	sev.sigev_signo = SIGUSR1;
+	sev.sigev_value.sival_ptr = NULL;
+	if(timer_create(CLOCK_REALTIME, &sev, timerid) == -1){
+		perror("timer create failed");
+		return -1;
+	}
+	
+	its.it_value.tv_sec = interval;
+	its.it_value.tv_nsec = 0;
+	its.it_interval.tv_sec = its.it_value.tv_sec;
+	its.it_interval.tv_nsec = its.it_value.tv_nsec;
+	
+	if(timer_settime(*timerid, 0, &its, NULL) == -1){
+		perror("timer settime failed");
+		timer_delete(*timerid);
+		return -1;
+	}
+	
+	return 0;
+}
+
 int test_proc_conn(){
-    signal(SIGINT, sigint_hand);
+    timer_t timerid;
 
     int sock = sock_crea();
-    if(sock < 0)
+    if(sock < 0){
         return -1;
+    }
+	
+	if(timer_setup(&timerid, 10) == -1){           //10 seconds logg flush
+	    close(sock);
+	    return -1;
+	}
 
     proc_tabl *table = calloc(1, sizeof(proc_tabl));
     if(!table){
@@ -184,10 +237,13 @@ int test_proc_conn(){
     while(running){
         //sleep(1);
         sock_reci(table, sock);
+        if(logg_run == 1){
+	        logg_proc_parse(table);
+	        logg_run = 0;
+        }
     }
 
-    logg_proc_parse(table);
-
+	timer_delete(timerid);
     sock_unre(sock);
     close(sock);
     proc_tabl_dest(table);

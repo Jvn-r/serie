@@ -36,6 +36,7 @@ moving from quick prototyping in python to actual implementation in C to enable 
 - exit event handled
 - logger implemented
 - comm, exec, uid, gid events handled
+- periodic logger
 
 ## Architecture
 ### Process Table
@@ -77,12 +78,15 @@ processed deliverable docs in `/docs`
 - DELI 14 - Logger Integ
 - DELI 15 - fd_paths Imple and Time Bug Fix
 - DELI 16 - comm, exec, UID and GID
+- DELI 17 - periodic logger
 
 ## Running
 - python :`python /py_proto/serie.py`
 - C : `gcc -Wall -Wextra main.c ser_proc.c -o serie; ./serie`
 - proc conn : `gcc -Wall -Wextra tests/main.c c_core/ser_proc_conn.c -o test ;./test`
-- logger : `gcc -g -Wall -Wextra tests/main.c c_core/cJSON.c c_core/ser_proc.c c_core/ser_prfs.c c_core/ser_logg.c c_core/ser_proc_conn.c -o test;./test`
+- logger : `gcc -g -Wall -Wextra tests/main.c c_core/cJSON.c c_core/ser_proc.c c_core/ser_prfs.c c_core/ser_logg.c c_core/ser_proc_conn.c -lrt -o test;`
+
+valgrind : `sudo valgrind -s --leak-check=full ./test`
 
 ## Python Prototype Example output
 ```
